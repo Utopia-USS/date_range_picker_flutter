@@ -1,7 +1,7 @@
 name: z_date_range_picker
 description: Shows a full screen modal dialog containing a Material Design date range picker..
 version: 0.0.5
-homepage: "https://gitee.com/qqzhao/flutter_pubs"
+homepage: "https://github.com/Utopia-USS/date_range_picker_flutter"
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
