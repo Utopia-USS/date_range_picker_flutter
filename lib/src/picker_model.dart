@@ -1,11 +1,12 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import 'month_item_widget.dart';
 
 class PickerModel extends ChangeNotifier {
+  static DateFormat formatter = DateFormat('MMMM yyyy');
+
   PickerModel({required this.selectRange, required this.validRange}) {
-    /// 这里为了 copy 赋值，不会修改外面的值
     selectRange = CustomDateTimeRange(start: selectRange.start, end: selectRange.end);
     if (selectRange.start != null) {
       selectRange.start = DateUtils.dateOnly(selectRange.start!);
@@ -15,7 +16,6 @@ class PickerModel extends ChangeNotifier {
       selectRange.end = DateUtils.dateOnly(selectRange.end!);
     }
 
-    /// 如果有选择范围，优先选择开始值；否则优先选择当前日期对应的pageIndex
     if (selectRange.start != null && selectRange.end != null) {
       pageIndex = _findIndexForDay(selectRange.start!);
     } else {
@@ -27,7 +27,8 @@ class PickerModel extends ChangeNotifier {
   int _findIndexForDay(DateTime date) {
     int retIndex = 0;
     for (int index = 0;; index++) {
-      final DateTime month = DateUtils.addMonthsToMonthDate(DateTime(validRange.start!.year, validRange.start!.month), index);
+      final DateTime month =
+      DateUtils.addMonthsToMonthDate(DateTime(validRange.start!.year, validRange.start!.month), index);
       if (month.month == date.month && month.year == date.year) {
         retIndex = index;
         break;
@@ -40,41 +41,26 @@ class PickerModel extends ChangeNotifier {
   }
 
   CustomDateTimeRange selectRange;
-  CustomDateTimeRange validRange = CustomDateTimeRange(start: DateTime(2021, 7), end: DateTime(2022, 7));
+  final CustomDateTimeRange validRange;
 
   int pageIndex = 1;
   PageController pageController = PageController(initialPage: 0);
 
-  int get monthIndex {
-    var res = (pageIndex + validRange.start!.month) % 12;
-    return res == 0 ? 12 : res;
-  }
-
-  void dispose() {
-    super.dispose();
-  }
-
-  void _vibrate() {
-    // switch (Theme.of(context).platform) {
-    //   case TargetPlatform.android:
-    //   case TargetPlatform.fuchsia:
-    //     HapticFeedback.vibrate();
-    //     break;
-    //   default:
-    //     break;
-    // }
+  String get title {
+    final DateTime res = DateTime(validRange.start!.year, validRange.start!.month + pageIndex);
+    return formatter.format(res);
   }
 
   void nextPage() {
-    pageController.nextPage(duration: Duration(milliseconds: 500), curve: Curves.easeInOut);
+    pageController.nextPage(duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
   }
 
   void prevPage() {
-    pageController.previousPage(duration: Duration(milliseconds: 500), curve: Curves.easeInOut);
+    pageController.previousPage(duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
   }
 
   void animateToPage(int index) {
-    pageController.animateToPage(index, duration: Duration(milliseconds: 500), curve: Curves.easeInOut);
+    pageController.animateToPage(index, duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
   }
 
   void updatePageIndex(int index) {
@@ -83,7 +69,6 @@ class PickerModel extends ChangeNotifier {
   }
 
   void updateRange(CustomDateTimeRange range) {
-    /// 这里优先跳转到当前时间的页面
     var pageIndexTmp = _findIndexForDay(DateTime.now());
     animateToPage(pageIndexTmp);
     selectRange = range;
@@ -105,9 +90,7 @@ class PickerModel extends ChangeNotifier {
   }
 
   void updateSelection(DateTime date) {
-    _vibrate();
     if (selectRange.start != null && selectRange.end == null) {
-      // && !date.isBefore(_startDate!)
       if (!date.isBefore(selectRange.start!)) {
         selectRange.end = date;
       } else {

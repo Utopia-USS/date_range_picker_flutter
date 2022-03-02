@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:telgani_partners/common/constants/app_font.dart';
 
-import 'flexible.dart';
 import 'month_item_widget.dart';
 import 'picker_model.dart';
-import 'package:intl/intl.dart';
-import 'package:intl/date_symbol_data_local.dart';
 
 class PickerMainContent extends StatefulWidget {
   final PickerModel model;
+
   const PickerMainContent({Key? key, required this.model}) : super(key: key);
 
   @override
@@ -15,16 +14,6 @@ class PickerMainContent extends StatefulWidget {
 }
 
 class _PickerMainContentState extends State<PickerMainContent> {
-
-  List months = ['Januari','Febuari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    initializeDateFormatting();
-  }
-
   @override
   Widget build(BuildContext context) {
     final PickerModel vm = widget.model;
@@ -33,7 +22,7 @@ class _PickerMainContentState extends State<PickerMainContent> {
       child: Column(
         children: [
           _ContentHeader(
-            title: '${months[vm.monthIndex - 1]}',
+            title: vm.title,
             leftCallback: vm.prevPage,
             rightCallback: vm.nextPage,
           ),
@@ -44,7 +33,8 @@ class _PickerMainContentState extends State<PickerMainContent> {
               child: PageView.builder(
                 controller: vm.pageController,
                 itemBuilder: (BuildContext context, int index) {
-                  final DateTime month = DateUtils.addMonthsToMonthDate(DateTime(vm.validRange.start!.year, vm.validRange.start!.month), index);
+                  final DateTime month = DateUtils.addMonthsToMonthDate(
+                      DateTime(vm.validRange.start!.year, vm.validRange.start!.month), index);
                   return Container(
                     color: Colors.white,
                     child: MonthItemWidget(
@@ -70,26 +60,27 @@ class _ContentHeader extends StatelessWidget {
   final String title;
   final VoidCallback? leftCallback;
   final VoidCallback? rightCallback;
+
   const _ContentHeader({this.title = '', this.leftCallback, this.rightCallback});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 70.w,
+    return SizedBox(
+      height: 70,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           _ArrowBtn(
             callback: leftCallback,
           ),
-          Container(
-            child: Text(
-              '$title',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-                fontSize: 18.w,
-              ),
+          Text(
+            title,
+            style: const TextStyle(
+              fontWeight: FontWeight.w500,
+              color: Colors.black87,
+              fontSize: 20,
+              fontFamily: AppFont.hanimationArabic,
+              letterSpacing: 0.5,
             ),
           ),
           _ArrowBtn(
@@ -105,6 +96,7 @@ class _ContentHeader extends StatelessWidget {
 class _ArrowBtn extends StatelessWidget {
   final VoidCallback? callback;
   final bool isLeft;
+
   const _ArrowBtn({this.callback, this.isLeft = true});
 
   @override
@@ -112,13 +104,14 @@ class _ArrowBtn extends StatelessWidget {
     return GestureDetector(
       onTap: callback,
       child: Container(
-        width: 70.w,
-        height: 40.w,
+        margin: const EdgeInsets.all(16),
+        width: 30,
+        height: 30,
         color: Colors.transparent,
         child: Icon(
           isLeft ? Icons.arrow_back_ios_rounded : Icons.arrow_forward_ios_rounded,
-          size: 16.w,
-          color: Color(0xFF80838D),
+          size: 16,
+          color: Colors.black87,
         ),
       ),
     );

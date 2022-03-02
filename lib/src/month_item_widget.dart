@@ -3,20 +3,14 @@ import 'dart:math' as math;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:telgani_partners/common/constants/app_colors.dart';
+import 'package:telgani_partners/common/constants/app_font.dart';
 
-import 'flexible.dart';
-
-// const Duration _monthScrollDuration = Duration(milliseconds: 200);
-
-// double _monthItemHeaderHeight = 58.w;
-double _monthItemFooterHeight = 4.0.w;
-double _monthItemRowHeight = 31.0.w;
-double _monthItemSpaceBetweenRows = 8.0.w;
-double _horizontalPadding = 8.0.w;
-double _maxCalendarWidthLandscape = 384.0.w;
-double _maxCalendarWidthPortrait = 480.0.w;
-
-Color _colorBlue = Color(0xFF0088FB);
+double _monthItemRowHeight = 31.0;
+double _monthItemSpaceBetweenRows = 8.0;
+double _horizontalPadding = 8.0;
+double _maxCalendarWidthLandscape = 384.0;
+double _maxCalendarWidthPortrait = 480.0;
 
 const _MonthItemGridDelegate _monthItemGridDelegate = _MonthItemGridDelegate();
 
@@ -24,7 +18,7 @@ class CustomDateTimeRange {
   DateTime? start;
   DateTime? end;
 
-  CustomDateTimeRange({this.start, this.end});
+  CustomDateTimeRange({required this.start, required this.end});
 }
 
 class MonthItemWidget extends StatelessWidget {
@@ -33,7 +27,8 @@ class MonthItemWidget extends StatelessWidget {
   final DateTime firstDate;
   final DateTime lastDate;
   final ValueChanged<DateTime> changedCallback;
-  MonthItemWidget({
+
+  const MonthItemWidget({
     required this.displayedMonth,
     required this.range,
     required this.firstDate,
@@ -43,23 +38,14 @@ class MonthItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Column(
-        children: [
-          Row(
-            children: [],
-          ),
-          _MonthItem(
-            selectedDateEnd: range.end,
-            selectedDateStart: range.start,
-            currentDate: DateTime.now().add(Duration(days: 1)),
-            onChanged: changedCallback,
-            displayedMonth: displayedMonth,
-            firstDate: firstDate,
-            lastDate: lastDate,
-          ),
-        ],
-      ),
+    return _MonthItem(
+      selectedDateEnd: range.end,
+      selectedDateStart: range.start,
+      currentDate: DateTime.now().add(const Duration(days: 1)),
+      onChanged: changedCallback,
+      displayedMonth: displayedMonth,
+      firstDate: firstDate,
+      lastDate: lastDate,
     );
   }
 }
@@ -122,7 +108,8 @@ class _MonthItemState extends State<_MonthItem> {
 
     /// 获取当前月份中的天数
     final int daysInMonth = DateUtils.getDaysInMonth(widget.displayedMonth.year, widget.displayedMonth.month);
-    _dayFocusNodes = List<FocusNode>.generate(daysInMonth, (int index) => FocusNode(skipTraversal: true, debugLabel: 'Day ${index + 1}'));
+    _dayFocusNodes = List<FocusNode>.generate(
+        daysInMonth, (int index) => FocusNode(skipTraversal: true, debugLabel: 'Day ${index + 1}'));
   }
 
   @override
@@ -144,32 +131,8 @@ class _MonthItemState extends State<_MonthItem> {
   }
 
   Color _highlightColor(BuildContext context) {
-    return _colorBlue.withOpacity(0.3);
+    return AppColors.primary.withOpacity(0.3);
   }
-
-  // void _dayFocusChanged(bool focused) {
-  //   if (focused) {
-  //     final TraversalDirection? focusDirection = _FocusedDate.of(context)?.scrollDirection;
-  //     if (focusDirection != null) {
-  //       ScrollPositionAlignmentPolicy policy = ScrollPositionAlignmentPolicy.explicit;
-  //       switch (focusDirection) {
-  //         case TraversalDirection.up:
-  //         case TraversalDirection.left:
-  //           policy = ScrollPositionAlignmentPolicy.keepVisibleAtStart;
-  //           break;
-  //         case TraversalDirection.right:
-  //         case TraversalDirection.down:
-  //           policy = ScrollPositionAlignmentPolicy.keepVisibleAtEnd;
-  //           break;
-  //       }
-  //       Scrollable.ensureVisible(
-  //         primaryFocus!.context!,
-  //         duration: _monthScrollDuration,
-  //         alignmentPolicy: policy,
-  //       );
-  //     }
-  //   }
-  // }
 
   /// build 某天的 Widget
   /// firstDayOffset：距离第一天偏移；daysInMonth： 这个月一共多少天；dayToBuild 构建的日期值；
@@ -185,14 +148,18 @@ class _MonthItemState extends State<_MonthItem> {
     final bool isDisabled = dayToBuild.isAfter(widget.lastDate) || dayToBuild.isBefore(widget.firstDate);
 
     BoxDecoration? decoration;
-    TextStyle? itemStyle = textTheme.bodyText2!.copyWith(fontSize: 16.w);
+    TextStyle? itemStyle = textTheme.bodyText2!.copyWith(fontSize: 16);
 
     final bool isRangeSelected = widget.selectedDateStart != null && widget.selectedDateEnd != null;
-    final bool isSelectedDayStart = widget.selectedDateStart != null && dayToBuild.isAtSameMomentAs(widget.selectedDateStart!);
+    final bool isSelectedDayStart =
+        widget.selectedDateStart != null && dayToBuild.isAtSameMomentAs(widget.selectedDateStart!);
     // final bool isSelectedDayStart = widget.selectedDateStart != null && dayToBuild.isAtSameDayAs(widget.selectedDateStart!);
-    final bool isSelectedDayEnd = widget.selectedDateEnd != null && dayToBuild.isAtSameMomentAs(widget.selectedDateEnd!);
+    final bool isSelectedDayEnd =
+        widget.selectedDateEnd != null && dayToBuild.isAtSameMomentAs(widget.selectedDateEnd!);
     // final bool isSelectedDayEnd = widget.selectedDateEnd != null && dayToBuild.isAtSameDayAs(widget.selectedDateEnd!);
-    final bool isInRange = isRangeSelected && dayToBuild.isAfter(widget.selectedDateStart!) && dayToBuild.isBefore(widget.selectedDateEnd!);
+    final bool isInRange = isRangeSelected &&
+        dayToBuild.isAfter(widget.selectedDateStart!) &&
+        dayToBuild.isBefore(widget.selectedDateEnd!);
 
     _HighlightPainter? highlightPainter;
 
@@ -200,14 +167,15 @@ class _MonthItemState extends State<_MonthItem> {
       // The selected start and end dates gets a circle background
       // highlight, and a contrasting text color.
       itemStyle = textTheme.bodyText2?.apply(color: colorScheme.onPrimary);
-      decoration = BoxDecoration(
-        color: _colorBlue,
+      decoration = const BoxDecoration(
+        color: AppColors.primary,
         shape: BoxShape.circle,
       );
 
       /// 开始或者结束点
       if (isRangeSelected && widget.selectedDateStart != widget.selectedDateEnd) {
-        final _HighlightPainterStyle style = isSelectedDayStart ? _HighlightPainterStyle.highlightTrailing : _HighlightPainterStyle.highlightLeading;
+        final _HighlightPainterStyle style =
+            isSelectedDayStart ? _HighlightPainterStyle.highlightTrailing : _HighlightPainterStyle.highlightLeading;
         highlightPainter = _HighlightPainter(
           color: highlightColor,
           style: style,
@@ -226,9 +194,9 @@ class _MonthItemState extends State<_MonthItem> {
       itemStyle = textTheme.bodyText2?.apply(color: colorScheme.onSurface.withOpacity(0.38));
     } else if (DateUtils.isSameDay(widget.currentDate, dayToBuild)) {
       // The current day gets a different text color and a circle stroke border.
-      // itemStyle = textTheme.bodyText2?.apply(color: _colorBlue);
+      // itemStyle = textTheme.bodyText2?.apply(color: AppColors.primary);
       // decoration = BoxDecoration(
-      //   border: Border.all(color: _colorBlue, width: 1),
+      //   border: Border.all(color: AppColors.primary, width: 1),
       //   shape: BoxShape.circle,
       // );
     }
@@ -263,10 +231,9 @@ class _MonthItemState extends State<_MonthItem> {
 
     if (!isDisabled) {
       dayWidget = InkResponse(
-        // focusNode: _dayFocusNodes[day - 1],
         onTap: () => widget.onChanged(dayToBuild),
         radius: _monthItemRowHeight / 2 + 4,
-        splashColor: _colorBlue.withOpacity(0.38),
+        splashColor: AppColors.primary.withOpacity(0.38),
         // onFocusChange: _dayFocusChanged,
         child: dayWidget,
       );
@@ -298,13 +265,13 @@ class _MonthItemState extends State<_MonthItem> {
     final int weeks = ((daysInMonth + dayOffset) / DateTime.daysPerWeek).ceil();
 
     /// 计算总高度： _monthItemRowHeight是每行高度；_monthItemSpaceBetweenRows行间距
-    final double gridHeight = weeks * _monthItemRowHeight + (weeks - 1) * _monthItemSpaceBetweenRows + 23.w;
+    final double gridHeight = weeks * _monthItemRowHeight + (weeks - 1) * _monthItemSpaceBetweenRows;
     final List<Widget> dayItems = <Widget>[];
 
     for (int i = 0; true; i += 1) {
       // 1-based day of month, e.g. 1-31 for January, and 1-29 for February on a leap year.
       /// day 标识每月的第几天，从1开始计数，才有相应的 item；否则返回空的占位 Container(主要是将dayOffset偏移排除)
-      final int day = i - dayOffset + 1;
+      final int day = i - dayOffset + 2;
       if (day > daysInMonth) {
         break;
       }
@@ -365,54 +332,50 @@ class _MonthItemState extends State<_MonthItem> {
     double maxWidth = isLandscape ? _maxCalendarWidthLandscape : _maxCalendarWidthPortrait;
     maxWidth = math.min(maxWidth, MediaQuery.of(context).size.width);
     double cellWidth = (maxWidth - 2 * _horizontalPadding) / DateTime.daysPerWeek;
-    return Container(
-      // color: Colors.black26,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: _horizontalPadding),
-            width: maxWidth,
-            // color: Colors.purple,
-            margin: EdgeInsets.only(bottom: 12.w),
-            child: Row(
-              // mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: ['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((e) {
-                return Container(
-                  // color: Colors.yellow,
-                  width: cellWidth,
-                  child: Center(
-                    child: Text(
-                      '$e',
-                      style: TextStyle(
-                        fontSize: 16.w,
-                        color: Color(0xFF80838D),
-                      ),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: <Widget>[
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: _horizontalPadding),
+          width: maxWidth,
+          // color: Colors.purple,
+          margin: const EdgeInsets.only(bottom: 12),
+          child: Row(
+            // mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: ['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((e) {
+              return SizedBox(
+                width: cellWidth,
+                child: Center(
+                  child: Text(
+                    e,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontFamily: AppFont.nunito,
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w800,
                     ),
                   ),
-                );
-              }).toList(),
+                ),
+              );
+            }).toList(),
+          ),
+        ),
+        Container(
+          constraints: BoxConstraints(
+            maxWidth: maxWidth,
+            maxHeight: gridHeight,
+          ),
+          child: GridView.custom(
+            padding: EdgeInsets.zero,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: _monthItemGridDelegate,
+            childrenDelegate: SliverChildListDelegate(
+              paddedDayItems,
+              addRepaintBoundaries: false,
             ),
           ),
-          Container(
-            // color: Colors.yellow,
-            constraints: BoxConstraints(
-              maxWidth: maxWidth,
-              maxHeight: gridHeight,
-            ),
-            child: GridView.custom(
-              padding: EdgeInsets.zero,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: _monthItemGridDelegate,
-              childrenDelegate: SliverChildListDelegate(
-                paddedDayItems,
-                addRepaintBoundaries: false,
-              ),
-            ),
-          ),
-          SizedBox(height: _monthItemFooterHeight),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -539,7 +502,7 @@ class _MonthSliverGridLayout extends SliverGridLayout {
     required this.dayChildWidth,
     required this.edgeChildWidth,
     required this.reverseCrossAxis,
-  })   : assert(crossAxisCount > 0),
+  })  : assert(crossAxisCount > 0),
         assert(dayChildWidth >= 0),
         assert(edgeChildWidth >= 0);
 
@@ -588,7 +551,9 @@ class _MonthSliverGridLayout extends SliverGridLayout {
 
   double _getCrossAxisOffset(double crossAxisStart, bool isPadding) {
     if (reverseCrossAxis) {
-      return ((crossAxisCount - 2) * dayChildWidth + 2 * edgeChildWidth) - crossAxisStart - (isPadding ? edgeChildWidth : dayChildWidth);
+      return ((crossAxisCount - 2) * dayChildWidth + 2 * edgeChildWidth) -
+          crossAxisStart -
+          (isPadding ? edgeChildWidth : dayChildWidth);
     }
     return crossAxisStart;
   }
